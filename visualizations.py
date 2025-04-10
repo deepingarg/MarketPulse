@@ -25,8 +25,13 @@ def plot_stock_price(symbol, start_date_str, end_date_str):
         plotly.graph_objects.Figure: Plotly figure object
     """
     try:
-        # Load stock data
-        data = load_stock_data(symbol, start_date_str, end_date_str)
+        # Load stock data from database
+        from database_manager import load_stock_data_from_db
+        data = load_stock_data_from_db(symbol, start_date_str, end_date_str)
+        
+        # Fallback to CSV if database is empty
+        if data.empty:
+            data = load_stock_data(symbol, start_date_str, end_date_str)
         
         if data.empty:
             logger.warning(f"No data available for {symbol} from {start_date_str} to {end_date_str}")

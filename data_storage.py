@@ -126,7 +126,17 @@ def load_stock_data(symbol, start_date_str, end_date_str):
     ensure_data_dir()
     
     try:
-        # Convert dates to datetime objects for comparison
+        # Clean symbol for filename matching
+        clean_symbol = symbol.replace('.', '_').replace(':', '_').replace('/', '_')
+        
+        # Load from database first
+        from database_manager import load_stock_data_from_db
+        df = load_stock_data_from_db(symbol, start_date_str, end_date_str)
+        
+        if not df.empty:
+            return df
+            
+        # Fallback to CSV if database is empty
         start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
         end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
         
@@ -138,7 +148,6 @@ def load_stock_data(symbol, start_date_str, end_date_str):
                 if start_date <= date <= end_date:
                     date_dirs.append(date_str)
             except ValueError:
-                # Skip directories that don't match the date format
                 continue
         
         if not date_dirs:

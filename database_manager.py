@@ -63,12 +63,16 @@ def save_to_db(data, symbol, date_str=None):
         bool: True if successful, False otherwise
     """
     try:
-        if data is None or data.empty:
+        if data is None or (hasattr(data, 'empty') and data.empty):
             logger.warning(f"No data to save for {symbol}")
             return False
         
-        # Make a copy to avoid modifying the original DataFrame
-        df = data.copy()
+        # If data is a Series, convert it to a DataFrame
+        if isinstance(data, pd.Series):
+            df = pd.DataFrame([data])
+        else:
+            # Make a copy to avoid modifying the original DataFrame
+            df = data.copy()
         
         # Reset index if Date is the index
         if isinstance(df.index, pd.DatetimeIndex):

@@ -137,14 +137,19 @@ def plot_comparison(symbols, start_date_str, end_date_str, normalize=True):
             from database_manager import load_stock_data_from_db
             data = load_stock_data_from_db(symbol, start_date_str, end_date_str)
             
-            # Ensure data has proper date index
-            if not data.empty and not isinstance(data.index, pd.DatetimeIndex):
-                data.index = pd.to_datetime(data.index)
-
             if data.empty:
                 logger.warning(f"No data available for {symbol} from {start_date_str} to {end_date_str}")
                 continue
 
+            # Reset index if Date is in the index
+            if isinstance(data.index, pd.DatetimeIndex):
+                data = data.reset_index()
+            elif 'date' in data.columns:
+                data = data.rename(columns={'date': 'Date'})
+
+            # Ensure Date column is datetime
+            data['Date'] = pd.to_datetime(data['Date'])
+            
             # Sort by date
             data = data.sort_values('Date')
 

@@ -227,6 +227,21 @@ def plot_comparison(symbols, start_date_str, end_date_str, normalize=True):
 def plot_moving_averages(ma_data, symbol, short_window=5, long_window=20):
     """
     Create a chart with moving averages
+    """
+    # Ensure proper date handling
+    def prepare_data(data):
+        if data is None or data.empty:
+            return None
+        if isinstance(data.index, pd.DatetimeIndex):
+            data = data.reset_index()
+        if 'Date' not in data.columns and 'date' in data.columns:
+            data = data.rename(columns={'date': 'Date'})
+        if 'Date' not in data.columns:
+            data['Date'] = data.index
+        data['Date'] = pd.to_datetime(data['Date'])
+        return data
+    
+    ma_data = prepare_data(ma_data)
 
     Args:
         ma_data (pd.DataFrame): DataFrame with moving average data
@@ -351,6 +366,15 @@ def plot_volume_analysis(volume_data, symbol):
     try:
         if volume_data is None or volume_data.empty:
             logger.warning(f"No volume data available for {symbol}")
+            # Create empty figure with message
+            fig = go.Figure()
+            fig.add_annotation(
+                text="No volume data available",
+                xref="paper", yref="paper",
+                x=0.5, y=0.5, showarrow=False
+            )
+            fig.update_layout(title=f"{symbol} - No Volume Data")
+            return fig
             
         # Reset index if Date is in index
         if isinstance(volume_data.index, pd.DatetimeIndex):
@@ -361,10 +385,9 @@ def plot_volume_analysis(volume_data, symbol):
             volume_data = volume_data.rename(columns={'date': 'Date'})
             
         # Convert Date to datetime
+        if 'Date' not in volume_data.columns:
+            volume_data['Date'] = volume_data.index
         volume_data['Date'] = pd.to_datetime(volume_data['Date'])
-
-            # Create empty figure with message
-        fig = go.Figure()
         fig.add_annotation(
             text="No volume data available",
             xref="paper", yref="paper",

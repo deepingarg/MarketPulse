@@ -362,6 +362,17 @@ def plot_volume_analysis(volume_data, symbol):
     try:
         if volume_data is None or volume_data.empty:
             logger.warning(f"No volume data available for {symbol}")
+            
+        # Reset index if Date is in index
+        if isinstance(volume_data.index, pd.DatetimeIndex):
+            volume_data = volume_data.reset_index()
+            
+        # Ensure Date column exists
+        if 'date' in volume_data.columns:
+            volume_data = volume_data.rename(columns={'date': 'Date'})
+            
+        # Convert Date to datetime
+        volume_data['Date'] = pd.to_datetime(volume_data['Date'])
 
             # Create empty figure with message
             fig = go.Figure()

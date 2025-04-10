@@ -133,8 +133,13 @@ def plot_comparison(symbols, start_date_str, end_date_str, normalize=True):
         # Process each symbol
         valid_data = False
         for symbol in symbols:
-            # Load stock data
-            data = load_stock_data(symbol, start_date_str, end_date_str)
+            # Load stock data from database
+            from database_manager import load_stock_data_from_db
+            data = load_stock_data_from_db(symbol, start_date_str, end_date_str)
+            
+            # Ensure data has proper date index
+            if not data.empty and not isinstance(data.index, pd.DatetimeIndex):
+                data.index = pd.to_datetime(data.index)
 
             if data.empty:
                 logger.warning(f"No data available for {symbol} from {start_date_str} to {end_date_str}")

@@ -255,8 +255,11 @@ elif page == "Stock Analysis":
         else:
             st.subheader(f"Data for {selected_date}")
             
+            # Reset index to get Symbol and Date as columns
+            data_reset = data.reset_index()
+            
             # Display available stocks
-            available_symbols = data['Symbol'].unique().tolist()
+            available_symbols = data_reset['Symbol'].unique().tolist()
             
             analysis_type = st.selectbox(
                 "Select Analysis Type",
@@ -548,8 +551,11 @@ elif page == "Data Visualization":
         if data.empty:
             st.warning(f"No data available for {selected_date}")
         else:
+            # Reset index to get Symbol and Date as columns
+            data_reset = data.reset_index()
+            
             # Display available stocks
-            available_symbols = data['Symbol'].unique().tolist()
+            available_symbols = data_reset['Symbol'].unique().tolist()
             
             # Visualization type
             viz_type = st.selectbox(
@@ -676,7 +682,9 @@ elif page == "Data Visualization":
                             date_str = date.strftime("%Y-%m-%d")
                             daily_data = load_from_db(date_str)
                             if not daily_data.empty:
-                                symbol_price = daily_data[daily_data['Symbol'] == symbol]
+                                # Reset index to get Symbol as column
+                                daily_data_reset = daily_data.reset_index()
+                                symbol_price = daily_data_reset[daily_data_reset['Symbol'] == symbol]
                                 if not symbol_price.empty:
                                     symbol_data = pd.concat([symbol_data, symbol_price])
                         

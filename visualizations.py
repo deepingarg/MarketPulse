@@ -153,6 +153,17 @@ def plot_comparison(symbols, start_date_str, end_date_str, normalize=True):
                     data['Date'] = data[col]
                     data = data.drop(columns=[col])
             
+            # Ensure proper date column
+            if isinstance(data.index, pd.DatetimeIndex):
+                data = data.reset_index()
+            
+            # Make sure Date column exists
+            if 'date' in data.columns:
+                data = data.rename(columns={'date': 'Date'})
+            
+            # Convert Date to datetime
+            data['Date'] = pd.to_datetime(data['Date'])
+            
             # Sort by date
             data = data.sort_values('Date')
 

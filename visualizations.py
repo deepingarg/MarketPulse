@@ -375,14 +375,14 @@ def plot_volume_analysis(volume_data, symbol):
         volume_data['Date'] = pd.to_datetime(volume_data['Date'])
 
             # Create empty figure with message
-            fig = go.Figure()
-            fig.add_annotation(
-                text="No volume data available",
-                xref="paper", yref="paper",
-                x=0.5, y=0.5, showarrow=False
-            )
-            fig.update_layout(title=f"{symbol} - No Volume Data")
-            return fig
+        fig = go.Figure()
+        fig.add_annotation(
+            text="No volume data available",
+            xref="paper", yref="paper",
+            x=0.5, y=0.5, showarrow=False
+        )
+        fig.update_layout(title=f"{symbol} - No Volume Data")
+        return fig
 
         # Create figure with secondary y-axis
         fig = make_subplots(

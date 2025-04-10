@@ -36,17 +36,39 @@ if not os.path.exists("data"):
 # Initialize the database
 initialize_db()
 
+# Check for data in the database and migrate if needed
+db_dates = get_available_dates()
+csv_dates = get_available_dates_csv()
+
+# If database is empty but CSV data exists, auto-migrate
+if not db_dates and csv_dates:
+    st.sidebar.warning("Database is empty. Migrating data from CSV...")
+    # Use st.spinner (not available in sidebar)
+    migration_status = st.sidebar.empty()
+    migration_status.info("Migrating data from CSV to database...")
+    success = migrate_csv_to_db()
+    if success:
+        migration_status.success("✅ Data migration completed successfully")
+        # Refresh available dates after migration
+        db_dates = get_available_dates()
+    else:
+        migration_status.error("❌ Error during data migration")
+
 # Add a database migration option in the sidebar
 if st.sidebar.checkbox("Database Options", False):
     st.sidebar.info("Database operations")
     
     if st.sidebar.button("Migrate CSV Data to Database"):
-        with st.spinner("Migrating data from CSV to database..."):
-            success = migrate_csv_to_db()
-            if success:
-                st.sidebar.success("✅ Data migration completed successfully")
-            else:
-                st.sidebar.error("❌ Error during data migration")
+        # Use empty placeholder for status updates
+        migration_status_manual = st.sidebar.empty()
+        migration_status_manual.info("Migrating data from CSV to database...")
+        success = migrate_csv_to_db()
+        if success:
+            migration_status_manual.success("✅ Data migration completed successfully")
+            # Refresh available dates after migration
+            db_dates = get_available_dates()
+        else:
+            migration_status_manual.error("❌ Error during data migration")
 
 # Main title
 st.title("📊 Indian Stock Market Analyzer")

@@ -2,7 +2,18 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import logging
-from data_storage import load_data, load_stock_data, get_available_dates, get_available_symbols
+# Import database functions as primary data source
+from database_manager import (
+    load_from_db as load_data,
+    load_stock_data_from_db as load_stock_data,
+    get_available_dates_from_db as get_available_dates,
+    get_available_symbols_from_db as get_available_symbols
+)
+# Import CSV functions as fallback
+from data_storage import (
+    load_data as load_data_csv,
+    load_stock_data as load_stock_data_csv
+)
 
 # Configure logging
 logging.basicConfig(

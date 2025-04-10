@@ -106,7 +106,15 @@ def save_to_db(data, symbol, date_str=None):
         })
         
         # Create ID column (symbol_date)
-        df['id'] = df.apply(lambda row: f"{row['symbol']}_{row['date'].strftime('%Y-%m-%d')}", axis=1)
+        # Safely format the date to handle both datetime and Series objects
+        def format_date(date_val):
+            if hasattr(date_val, 'strftime'):
+                return date_val.strftime('%Y-%m-%d')
+            else:
+                # Convert to string in case it's not a datetime object
+                return str(date_val).split(' ')[0]
+                
+        df['id'] = df.apply(lambda row: f"{row['symbol']}_{format_date(row['date'])}", axis=1)
         
         # Keep only necessary columns
         columns = ['id', 'symbol', 'date', 'open', 'high', 'low', 'close', 'volume']

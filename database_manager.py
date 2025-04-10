@@ -363,6 +363,7 @@ def migrate_csv_to_db():
             return True
             
         logger.info(f"Starting migration of {len(csv_dates)} dates from CSV to database")
+        success_count = 0
         
         # For each date, load data from CSV and save to database
         for date_str in csv_dates:
@@ -380,9 +381,30 @@ def migrate_csv_to_db():
             
             # Group by Symbol and save each stock's data
             for symbol, group in df.groupby('Symbol'):
-                save_to_db(group, symbol)
-                
-        logger.info("Migration from CSV to database completed successfully")
+                try:
+                    # Ensure Symbol column exists and has correct values
+                    if 'Symbol' not in group.columns:
+                        group['Symbol'] = symbol
+                    
+                    # Make sure date is properly formatted
+                    if 'Date' in group.columns and pd.api.types.is_datetime64_any_dtype(group['Date']):
+                        # Date is already a datetime type, keep it as is
+                        pass
+                    elif 'Date' in group.columns:
+                        # Try to convert string to datetime if needed
+                        group['Date'] = pd.to_datetime(group['Date'])
+                    else:
+                        # If Date not in columns, use the date from date_str
+                        group['Date'] = pd.to_datetime(date_str)
+                    
+                    success = save_to_db(group, symbol)
+                    if success:
+                        success_count += 1
+                except Exception as inner_e:
+                    logger.error(f"Error saving {symbol} data to database during migration: {str(inner_e)}")
+                    continue
+        
+        logger.info(f"Migration from CSV to database completed successfully: {success_count} stocks migrated")
         return True
         
     except Exception as e:

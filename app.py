@@ -280,13 +280,13 @@ elif page == "Stock Analysis":
                 )
                 
                 if filter_option == "Top Gainers":
-                    filtered_data = price_changes.sort_values("Change %", ascending=False).head(10)
+                    filtered_data = price_changes.sort_values("Change_Pct", ascending=False).head(10)
                     st.success("🚀 Top 10 Gainers")
                 elif filter_option == "Top Losers":
-                    filtered_data = price_changes.sort_values("Change %", ascending=True).head(10)
+                    filtered_data = price_changes.sort_values("Change_Pct", ascending=True).head(10)
                     st.error("📉 Top 10 Losers")
                 else:
-                    filtered_data = price_changes.sort_values("Change %", ascending=False)
+                    filtered_data = price_changes.sort_values("Change_Pct", ascending=False)
                 
                 # Display table and visualization
                 st.dataframe(filtered_data)

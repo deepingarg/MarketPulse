@@ -34,6 +34,14 @@ def get_price_change(data, previous_day_data=None):
         pd.DataFrame: DataFrame with price changes
     """
     try:
+        # Reset index if needed to get Symbol and Date as columns
+        if 'Symbol' not in data.columns and isinstance(data.index, pd.MultiIndex):
+            data = data.reset_index()
+        
+        # If previous_day_data is provided, also ensure Symbol column exists
+        if previous_day_data is not None and 'Symbol' not in previous_day_data.columns and isinstance(previous_day_data.index, pd.MultiIndex):
+            previous_day_data = previous_day_data.reset_index()
+            
         # If no previous day data provided, try to get it
         if previous_day_data is None:
             # Get available dates
@@ -57,19 +65,27 @@ def get_price_change(data, previous_day_data=None):
                             'Close': row['Close'],
                             'Previous': row['Open'],
                             'Change': change,
-                            'Change %': change_pct
+                            'Change_Pct': change_pct  # Use underscore instead of space
                         })
                 
                 return pd.DataFrame(changes)
             
-            # Get current date index
-            current_date = data['Date'].iloc[0].strftime('%Y-%m-%d') if 'Date' in data.columns else max(dates)
+            # Get current date from data if possible
+            if 'Date' in data.columns:
+                current_date = data['Date'].iloc[0].strftime('%Y-%m-%d')
+            else:
+                current_date = max(dates)
+            
             current_idx = dates.index(current_date) if current_date in dates else len(dates) - 1
             
             # Get previous trading day
             if current_idx > 0:
                 previous_date = dates[current_idx - 1]
                 previous_day_data = load_data(previous_date)
+                
+                # Reset index if needed to get Symbol as column
+                if 'Symbol' not in previous_day_data.columns and isinstance(previous_day_data.index, pd.MultiIndex):
+                    previous_day_data = previous_day_data.reset_index()
             else:
                 logger.warning("No previous day data available")
                 return pd.DataFrame()
@@ -81,9 +97,10 @@ def get_price_change(data, previous_day_data=None):
                 current_row = group.iloc[-1]
                 
                 # Find previous price for the same symbol
-                previous_price = previous_day_data[previous_day_data['Symbol'] == symbol]['Close'].iloc[-1] if len(previous_day_data[previous_day_data['Symbol'] == symbol]) > 0 else None
-                
-                if previous_price is not None:
+                symbol_previous_data = previous_day_data[previous_day_data['Symbol'] == symbol]
+                if not symbol_previous_data.empty:
+                    previous_price = symbol_previous_data['Close'].iloc[-1]
+                    
                     # Calculate change
                     change = current_row['Close'] - previous_price
                     change_pct = (change / previous_price * 100) if previous_price > 0 else 0
@@ -93,7 +110,7 @@ def get_price_change(data, previous_day_data=None):
                         'Close': current_row['Close'],
                         'Previous': previous_price,
                         'Change': change,
-                        'Change %': change_pct
+                        'Change_Pct': change_pct  # Use underscore instead of space
                     })
         
         return pd.DataFrame(changes)

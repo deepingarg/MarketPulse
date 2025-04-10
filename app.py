@@ -3,7 +3,13 @@ import pandas as pd
 import datetime
 import os
 from data_fetcher import fetch_stock_data, get_nifty50_symbols
-from data_storage import save_data, load_data, get_available_dates
+from database_manager import (
+    initialize_db, save_to_db, load_from_db, load_stock_data_from_db,
+    get_available_dates_from_db as get_available_dates,
+    get_available_symbols_from_db, migrate_csv_to_db
+)
+# Import CSV functions for potential fallback
+from data_storage import save_data as save_data_csv, load_data as load_data_csv, get_available_dates as get_available_dates_csv
 from analysis import (
     get_price_change, calculate_moving_averages, 
     detect_spikes, get_best_performers, 
@@ -26,6 +32,21 @@ st.set_page_config(
 # Create data directory if it doesn't exist
 if not os.path.exists("data"):
     os.makedirs("data")
+
+# Initialize the database
+initialize_db()
+
+# Add a database migration option in the sidebar
+if st.sidebar.checkbox("Database Options", False):
+    st.sidebar.info("Database operations")
+    
+    if st.sidebar.button("Migrate CSV Data to Database"):
+        with st.spinner("Migrating data from CSV to database..."):
+            success = migrate_csv_to_db()
+            if success:
+                st.sidebar.success("✅ Data migration completed successfully")
+            else:
+                st.sidebar.error("❌ Error during data migration")
 
 # Main title
 st.title("📊 Indian Stock Market Analyzer")
@@ -64,7 +85,7 @@ if page == "Home":
         # Show sample of available data
         st.subheader("Sample of Available Data")
         latest_date = max(dates)
-        sample_data = load_data(latest_date)
+        sample_data = load_from_db(latest_date)
         
         if not sample_data.empty:
             st.dataframe(sample_data.head(5))
@@ -157,7 +178,10 @@ elif page == "Fetch Data":
                         # Save data by date
                         for date, group in stock_data.groupby(stock_data.index.date):
                             date_str = date.strftime("%Y-%m-%d")
-                            save_data(group, symbol, date_str)
+                            # Save to database
+                            save_to_db(group, symbol, date_str)
+                            # Also save to CSV as backup
+                            save_data_csv(group, symbol, date_str)
                         
                         successful_fetches += 1
                         st.success(f"Successfully fetched data for {symbol}")
@@ -192,7 +216,7 @@ elif page == "Stock Analysis":
         )
         
         # Load data for the selected date
-        data = load_data(selected_date)
+        data = load_from_db(selected_date)
         
         if data.empty:
             st.warning(f"No data available for {selected_date}")
@@ -487,7 +511,7 @@ elif page == "Data Visualization":
         )
         
         # Load data for the selected date
-        data = load_data(selected_date)
+        data = load_from_db(selected_date)
         
         if data.empty:
             st.warning(f"No data available for {selected_date}")
@@ -618,7 +642,7 @@ elif page == "Data Visualization":
                         symbol_data = pd.DataFrame()
                         for date in pd.date_range(start=start_date, end=end_date):
                             date_str = date.strftime("%Y-%m-%d")
-                            daily_data = load_data(date_str)
+                            daily_data = load_from_db(date_str)
                             if not daily_data.empty:
                                 symbol_price = daily_data[daily_data['Symbol'] == symbol]
                                 if not symbol_price.empty:

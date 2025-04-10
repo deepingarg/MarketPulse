@@ -314,7 +314,7 @@ elif page == "Stock Analysis":
                 
                 # Detect spikes
                 spikes = detect_spikes(selected_symbol, start_date, end_date)
-                if spikes:
+                if not spikes.empty:
                     st.subheader("Detected Anomalies")
                     st.dataframe(spikes)
             

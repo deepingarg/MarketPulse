@@ -251,6 +251,10 @@ def plot_moving_averages(ma_data, symbol, short_window=5, long_window=20):
         return data
     
     ma_data = prepare_data(ma_data)
+
+    """
+    Args:
+        ma_data (pd.DataFrame): DataFrame with moving average data
         symbol (str): Stock symbol
         short_window (int): Short moving average window
         long_window (int): Long moving average window

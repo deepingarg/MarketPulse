@@ -74,10 +74,17 @@ def save_to_db(data, symbol, date_str=None):
         if isinstance(df.index, pd.DatetimeIndex):
             df = df.reset_index()
             
-        # Ensure 'Date' column exists and is in the right format
+        # Handle the case where 'Date' column might not exist
         if 'Date' not in df.columns:
-            logger.error(f"Date column not found in data for {symbol}")
-            return False
+            # If date_str is provided, use it
+            if date_str:
+                df['Date'] = pd.to_datetime(date_str)
+            # If df has a 'date' column (lowercase), use it
+            elif 'date' in df.columns:
+                df['Date'] = df['date']
+            else:
+                logger.error(f"Date column not found in data for {symbol} and no date_str provided")
+                return False
             
         # Convert Date to datetime if it's not already
         if not pd.api.types.is_datetime64_dtype(df['Date']):

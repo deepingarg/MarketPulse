@@ -1,0 +1,53 @@
+or fetching data for RELIANCE.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for TCS.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for HDFCBANK.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for INFY.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for ICICIBANK.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for HINDUNILVR.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for ITC.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for SBIN.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for BHARTIARTL.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for KOTAKBANK.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for LT.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for AXISBANK.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for ASIANPAINT.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for MARUTI.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for HCLTECH.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for SUNPHARMA.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for TATAMOTORS.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for ULTRACEMCO.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for TITAN.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for BAJFINANCE.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for NESTLEIND.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for WIPRO.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for TECHM.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for ADANIPORTS.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for POWERGRID.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for M&M.NS: 'RangeIndex' object has no attribute 'date'
+
+Error fetching data for NTPC.NS: 'RangeIndex' object has no attribute 'date'

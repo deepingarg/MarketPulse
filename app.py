@@ -176,12 +176,22 @@ elif page == "Fetch Data":
                     
                     if stock_data is not None and not stock_data.empty:
                         # Save data by date
-                        for date, group in stock_data.groupby(stock_data.index.date):
-                            date_str = date.strftime("%Y-%m-%d")
+                        # Check if index is DatetimeIndex
+                        if isinstance(stock_data.index, pd.DatetimeIndex):
+                            # Group by date
+                            for date, group in stock_data.groupby(stock_data.index.date):
+                                date_str = date.strftime("%Y-%m-%d")
+                                # Save to database
+                                save_to_db(group, symbol, date_str)
+                                # Also save to CSV as backup
+                                save_data_csv(group, symbol, date_str)
+                        else:
+                            # Handle case where index might not be a DatetimeIndex
+                            date_str = datetime.date.today().strftime("%Y-%m-%d")
                             # Save to database
-                            save_to_db(group, symbol, date_str)
+                            save_to_db(stock_data, symbol, date_str)
                             # Also save to CSV as backup
-                            save_data_csv(group, symbol, date_str)
+                            save_data_csv(stock_data, symbol, date_str)
                         
                         successful_fetches += 1
                         st.success(f"Successfully fetched data for {symbol}")

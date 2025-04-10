@@ -21,67 +21,13 @@ def get_nifty50_symbols():
         list: List of Nifty 50 stock symbols with .NS suffix
     """
     try:
-        # Try to fetch from NSE website
-        url = "https://www.nseindia.com/market-data/live-equity-market"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
-        }
+        logger.info("Attempting to fetch Nifty 50 symbols")
         
-        # First attempt with direct NSE website
-        try:
-            response = requests.get(url, headers=headers, timeout=10)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, 'html.parser')
-                # This would need to be adjusted based on actual NSE website structure
-                # which may change over time
-                # This is a placeholder for the actual extraction logic
-                return None  # Will fall back to the next method
-            else:
-                logger.warning(f"Failed to fetch Nifty 50 list from NSE website: {response.status_code}")
-                return None
-        except Exception as e:
-            logger.warning(f"Error fetching from NSE website: {str(e)}")
+        # Directly return hardcoded list for now to ensure reliability
+        # The web scraping of NSE website or Wikipedia can be unreliable due to structure changes
+        # or connection issues
+        return get_hardcoded_nifty50()
         
-        # Fallback to Wikipedia or another source
-        wiki_url = "https://en.wikipedia.org/wiki/NIFTY_50"
-        response = requests.get(wiki_url, headers=headers)
-        
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            # Find the table with Nifty 50 components
-            tables = soup.find_all('table', {'class': 'wikitable'})
-            
-            symbols = []
-            if tables:
-                # Look for the table with the right structure
-                for table in tables:
-                    headers = [th.get_text().strip() for th in table.find_all('th')]
-                    if 'Symbol' in headers or 'Ticker' in headers:
-                        # Get the index of the symbol/ticker column
-                        symbol_idx = headers.index('Symbol') if 'Symbol' in headers else headers.index('Ticker')
-                        
-                        # Extract symbols from the table rows
-                        for row in table.find_all('tr')[1:]:  # Skip header row
-                            cols = row.find_all('td')
-                            if len(cols) > symbol_idx:
-                                symbol = cols[symbol_idx].get_text().strip()
-                                if symbol:
-                                    # Add .NS suffix for Yahoo Finance
-                                    symbols.append(f"{symbol}.NS")
-                        
-                        if symbols:
-                            break
-            
-            if not symbols:
-                # If we couldn't extract from the tables, fall back to a hardcoded list
-                logger.warning("Could not extract symbols from Wikipedia, using hardcoded list")
-                return get_hardcoded_nifty50()
-            
-            return symbols
-        else:
-            logger.warning(f"Failed to fetch Nifty 50 list from Wikipedia: {response.status_code}")
-            return get_hardcoded_nifty50()
-    
     except Exception as e:
         logger.error(f"Error fetching Nifty 50 stocks: {str(e)}")
         return get_hardcoded_nifty50()
